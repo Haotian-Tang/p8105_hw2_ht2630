@@ -109,7 +109,7 @@ mr_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Mr. Trash Wheel
   
   select(1, trash_wheel_name, everything()) |>
   
-  select(-ncol(mr_trash_wheel_df):-(ncol(mr_trash_wheel_df)-1)) |>
+  select(-x15:-x16) |>
   
   mutate(date = day(ymd(date))) |>
   
@@ -125,23 +125,29 @@ professor_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Professo
   
   rename(dumpster_id = dumpster) |>
   
+  mutate(year = as.character(year)) |>
+  
   mutate(trash_wheel_name = "Professor Trash Wheel") |>
   
   select(1, trash_wheel_name, everything()) |>
   
   mutate(date = day(ymd(date))) |>
   
-  mutate(homes_powered = (weight_tons * 500) / 30)
-
+  mutate(homes_powered = (weight_tons * 500) / 30) |>
+  
 ```
 
-```{r}
+```{r Gwynnda Trash Wheel}
 
 gwynnda_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Gwynnda Trash Wheel') |>
   
   janitor::clean_names() |>
   
+  slice(-n() + 1) |>
+  
   rename(dumpster_id = dumpster) |>
+  
+  mutate(year = as.character(year)) |>
   
   mutate(trash_wheel_name = "Gwynnda Trash Wheel") |>
   
@@ -152,5 +158,30 @@ gwynnda_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Gwynnda Tr
   mutate(homes_powered = (weight_tons * 500) / 30)
 
 ```
+
+Combine them together
+
+```{r Combine}
+
+combined_df = 
+  bind_rows(mr_trash_wheel_df, professor_trash_wheel_df, gwynnda_trash_wheel_df)
+
+```
+
+We can see there are 585 rows of data of Mr. Trash wheel, 107 rows of Professor Trash wheel, and 156 rows of Gwynnda Trash Wheel. Each of the data frame contains a row which shows the total value of each column. Interestingly, there are two rows with identical dumpster id "21" in Gwynnda Trash wheel, which might be a typo. 
+
+And there are 848 rows of data in total. The variables of columns are dumpster, the date, the weight, the volume, types of trash, and the number of homes powered. The number of homes powered is calculated by the weights of trash multiplying 500 and divided by 30. 
+
+The total weight of trash collected by Professor Trash Wheel is 216.26 tons. 
+
+```{r}
+
+total_cigarettes = sum(head(gwynnda_trash_wheel_df$cigarette_butts, 5))
+
+total_cigarettes
+
+```
+
+The total number of cigarette butts collected by Gwynnda in July of 2021 is 16300. 
 
 
