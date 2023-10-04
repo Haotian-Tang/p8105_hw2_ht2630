@@ -14,7 +14,6 @@ library(readxl)
 
 Problem 1
 
-
 Clean data in pols_month.csv file.
 ```{r clean pols}
 
@@ -90,6 +89,21 @@ first_merge = left_join(pols_df, snp_df, by = c("year", "month"))
 
 merged_data = left_join(first_merge, unemployment_df, by = c("year", "month"))
 
+```
+
+The final data contains the specific date and pols, snp, and unemployment data. And we can also notice "NA" in the dataset, which means the data of those variables are missing.  
+
+---
+
+Problem 2
+
+```{r}
+
+mr_trash_wheel_df = read_excel("Trash_wheel_data.xlsx") |>
+  
+  janitor::clean_names() |>
+  
+  mutate(date = day(ymd(date)))
 ```
 
 
