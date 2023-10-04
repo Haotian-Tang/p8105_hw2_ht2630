@@ -97,7 +97,7 @@ The final data contains the specific date and pols, snp, and unemployment data. 
 
 Problem 2
 
-```{r}
+```{r Mr. Trash Wheel}
 
 mr_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Mr. Trash Wheel') |>
   
@@ -110,8 +110,35 @@ mr_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Mr. Trash Wheel
   mutate(date = day(ymd(date))) |>
   
   mutate(homes_powered = (weight_tons * 500) / 30)
-
   
+```
+
+```{r Professor Trash Wheel}
+
+professor_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Professor Trash Wheel') |>
+  
+  janitor::clean_names() |>
+  
+  rename(dumpster_id = dumpster) |>
+  
+  mutate(date = day(ymd(date))) |>
+  
+  mutate(homes_powered = (weight_tons * 500) / 30)
+
+```
+
+```{r}
+
+gwynnda_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Gwynnda Trash Wheel') |>
+  
+  janitor::clean_names() |>
+  
+  rename(dumpster_id = dumpster) |>
+  
+  mutate(date = day(ymd(date))) |>
+  
+  mutate(homes_powered = (weight_tons * 500) / 30)
+
 ```
 
 
