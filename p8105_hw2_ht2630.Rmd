@@ -99,11 +99,19 @@ Problem 2
 
 ```{r}
 
-mr_trash_wheel_df = read_excel("Trash_wheel_data.xlsx") |>
+mr_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Mr. Trash Wheel') |>
   
   janitor::clean_names() |>
   
-  mutate(date = day(ymd(date)))
+  rename(dumpster_id = dumpster) |>
+  
+  select(-ncol(mr_trash_wheel_df):-(ncol(mr_trash_wheel_df)-1)) |>
+  
+  mutate(date = day(ymd(date))) |>
+  
+  mutate(homes_powered = (weight_tons * 500) / 30)
+
+  
 ```
 
 
