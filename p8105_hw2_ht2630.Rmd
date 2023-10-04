@@ -1,0 +1,86 @@
+---
+title: "p8105_hw2_ht2630"
+author: "Haotian Tang"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+---
+
+Problem 1
+
+
+Clean data in pols_month.csv file.
+```{r clean pols}
+
+pols_df = 
+  read_csv("fivethirtyeight_datasets/pols-month.csv") |>
+  
+  janitor::clean_names() |>
+  
+  separate(mon, into = c("year", "month", "day"), sep = "-") |>
+  
+  mutate(year = as.integer(year),
+         month = as.integer(month),
+         day = as.integer(day)) |>
+  
+  mutate(month = factor(month, labels = month.name)) |>
+  
+  mutate(president = case_when(
+    prez_gop == 1 ~ "gop",
+    prez_dem == 1 ~ "dem",
+    prez_dem == 2 ~ "gop",
+  )) |>
+  
+  select(-prez_dem, -prez_gop, -day)
+```
+
+Clean data in snp.csv file. 
+
+```{r clean snp}
+
+snp_df = 
+  read_csv("fivethirtyeight_datasets/snp.csv") |>
+  
+  janitor::clean_names()|>
+
+  separate(date, into = c("month", "day", "year"), sep = "/") |>
+  
+  mutate(month = as.integer(month),
+         day = as.integer(day),
+         year = as.integer(year)) |>
+  
+  mutate(year = if_else(year < 100, year + 2000, year)) |>
+  
+  mutate(year = if_else(year > 2023, year - 100, year)) |>
+  
+  mutate(month = month.name[as.integer(month)]) |>
+  
+  arrange(year, month) |>
+  
+  select(year, month, close)
+
+```
+
+Tidy and merge them
+
+```{r clean unemployment}
+
+unemployment_df = 
+  read_csv("fivethirtyeight_datasets/unemployment.csv") |>
+  
+  pivot_longer(cols = -Year, names_to = "month", values_to = "unemployment_rate") |>
+
+  rename(year = Year) |>
+  
+  mutate(month = match(month, month.abb),
+         month = month.name[month]) |>
+  
+  arrange(year, month)
+```
+
