@@ -84,3 +84,12 @@ unemployment_df =
   arrange(year, month)
 ```
 
+```{r merge them together}
+
+first_merge = left_join(pols_df, snp_df, by = c("year", "month"))
+
+merged_data = left_join(first_merge, unemployment_df, by = c("year", "month"))
+
+```
+
+
