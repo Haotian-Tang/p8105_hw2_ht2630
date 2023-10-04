@@ -105,6 +105,10 @@ mr_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Mr. Trash Wheel
   
   rename(dumpster_id = dumpster) |>
   
+  mutate(trash_wheel_name = "Mr. Trash Wheel") |>
+  
+  select(1, trash_wheel_name, everything()) |>
+  
   select(-ncol(mr_trash_wheel_df):-(ncol(mr_trash_wheel_df)-1)) |>
   
   mutate(date = day(ymd(date))) |>
@@ -121,6 +125,10 @@ professor_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Professo
   
   rename(dumpster_id = dumpster) |>
   
+  mutate(trash_wheel_name = "Professor Trash Wheel") |>
+  
+  select(1, trash_wheel_name, everything()) |>
+  
   mutate(date = day(ymd(date))) |>
   
   mutate(homes_powered = (weight_tons * 500) / 30)
@@ -134,6 +142,10 @@ gwynnda_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Gwynnda Tr
   janitor::clean_names() |>
   
   rename(dumpster_id = dumpster) |>
+  
+  mutate(trash_wheel_name = "Gwynnda Trash Wheel") |>
+  
+  select(1, trash_wheel_name, everything()) |>
   
   mutate(date = day(ymd(date))) |>
   
