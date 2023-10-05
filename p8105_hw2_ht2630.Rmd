@@ -255,31 +255,28 @@ amyloid_df =
 
 colnames(amyloid_df) = c("Study_ID", "Baseline", "Year_2", "Year_4", "Year_6", "Year_8")
 
-amyloid_candidate = amyloid_df
-
 amyloid_df = slice(amyloid_df, 2:n()) |> 
   
   mutate(across(c("Baseline", "Year_2", "Year_4", "Year_6", "Year_8"), ~ replace(., . == "Na", NA))) |>
   
-  filter(
-    !is.na(Baseline),
-    !is.na(`Year_2`),
-    !is.na(`Year_4`),
-    !is.na(`Year_6`),
-    !is.na(`Year_8`)
-    ) 
+  pivot_longer(
+    Baseline:Year_8,
+    names_to = "year",
+    values_to = "value"
+  )
+  
 
 ```
 
 Similarly, the column names need to be changed and the first row is removed. 
 
-There are `r nrow(amyloid_candidate)` rows and `r ncol(amyloid_candidate)` columns. 
+There are `r nrow(amyloid_df)` rows and `r ncol(amyloid_df)` columns. 
 
 Variables are `r colnames(amyloid_df)`.
 
 And we remove patients who have NA at any year. 
 
-Since the rows are not equal(97 in baseline dataset and 430 in amyloid dataset), there are patients who are only in one dataset. 
+Since the rows are not equal, there are patients who are only in one dataset. 
 
 ```{r Merge them}
 
