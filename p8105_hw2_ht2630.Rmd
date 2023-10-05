@@ -99,7 +99,8 @@ Problem 2
 
 ```{r Mr. Trash Wheel}
 
-mr_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Mr. Trash Wheel') |>
+mr_trash_wheel_df = 
+  read_excel("Trash_wheel_data.xlsx", sheet = 'Mr. Trash Wheel') |>
   
   janitor::clean_names() |>
   
@@ -119,7 +120,8 @@ mr_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Mr. Trash Wheel
 
 ```{r Professor Trash Wheel}
 
-professor_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Professor Trash Wheel') |>
+professor_trash_wheel_df = 
+  read_excel("Trash_wheel_data.xlsx", sheet = 'Professor Trash Wheel') |>
   
   janitor::clean_names() |>
   
@@ -133,13 +135,18 @@ professor_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Professo
   
   mutate(date = day(ymd(date))) |>
   
-  mutate(homes_powered = (weight_tons * 500) / 30) |>
+  mutate(homes_powered = (weight_tons * 500) / 30) 
+  
+  total_trash = professor_trash_wheel_df[nrow(professor_trash_wheel_df), "weight_tons"]
+  
+  total_trash = as.numeric(total_trash)
   
 ```
 
 ```{r Gwynnda Trash Wheel}
 
-gwynnda_trash_wheel_df = read_excel("Trash_wheel_data.xlsx", sheet = 'Gwynnda Trash Wheel') |>
+gwynnda_trash_wheel_df = 
+  read_excel("Trash_wheel_data.xlsx", sheet = 'Gwynnda Trash Wheel') |>
   
   janitor::clean_names() |>
   
@@ -168,21 +175,20 @@ combined_df =
 
 ```
 
-We can see there are 585 rows of data of Mr. Trash wheel, 107 rows of Professor Trash wheel, and 156 rows of Gwynnda Trash Wheel. Each of the data frame contains a row which shows the total value of each column. Interestingly, there are two rows with identical dumpster id "21" in Gwynnda Trash wheel, which might be a typo. 
+We can see there are `r nrow(mr_trash_wheel_df)` rows of data of Mr. Trash wheel, `r nrow(professor_trash_wheel_df)` rows of Professor Trash wheel, and `r nrow(gwynnda_trash_wheel_df)` rows of Gwynnda Trash Wheel. Each of the data frame contains a row which shows the total value of each column. Interestingly, there are two rows with identical dumpster id "21" in Gwynnda Trash wheel, which might be a typo. 
 
-And there are 848 rows of data in total. The variables of columns are dumpster, the date, the weight, the volume, types of trash, and the number of homes powered. The number of homes powered is calculated by the weights of trash multiplying 500 and divided by 30. 
+And there are `r nrow(combined_df)` rows of data in total. The variables of columns are dumpster, the date, the weight, the volume, types of trash, and the number of homes powered. The number of homes powered is calculated by the weights of trash multiplying 500 and divided by 30. 
 
-The total weight of trash collected by Professor Trash Wheel is 216.26 tons. 
+The total weight of trash collected by Professor Trash Wheel is `r total_trash` tons. 
 
 ```{r}
 
 total_cigarettes = sum(head(gwynnda_trash_wheel_df$cigarette_butts, 5))
 
-total_cigarettes
 
 ```
 
-The total number of cigarette butts collected by Gwynnda in July of 2021 is 16300. 
+The total number of cigarette butts collected by Gwynnda in July of 2021 is `r total_cigarettes`. 
 
 ---
 
@@ -190,12 +196,13 @@ Problem 3
 
 ```{r baseline}
 
-baseline_df = read_csv("data_mci/MCI_baseline.csv") 
+baseline_df = 
+  read_csv("data_mci/MCI_baseline.csv") 
 
-colnames(baseline_df) = c("ID", "Age_at_study_baseline", "Sex", "Years_of_Education", "Apoe4_carrier", "Age_at_onset")
+colnames(baseline_df) = c("Study_ID", "Age_at_study_baseline", "Sex", "Years_of_Education", "Apoe4_carrier", "Age_at_onset")
 
 baseline_df = slice(baseline_df, 2:n()) |>
-  
+
   mutate(Sex = case_when(
     Sex == 0 ~ "male",
     Sex == 1 ~ "female",
@@ -206,12 +213,77 @@ baseline_df = slice(baseline_df, 2:n()) |>
     Apoe4_carrier == 0 ~ "No",
     Apoe4_carrier == 1 ~ "Yes",
     TRUE ~ as.character(Apoe4_carrier)
-  ))
+  )) 
   
+  total_females = sum(baseline_df$Sex == "female")
+  
+  female_apoe4_carriers = sum(baseline_df$Sex == "female" & baseline_df$`Apoe4_carrier` == "Yes")
+  
+  proportion = female_apoe4_carriers / total_females
+
+  baseline_df |>
+    
+  filter(`Age_at_onset` != ".")
+  
+  age = as.numeric(baseline_df$Age_at_study_baseline) 
+    
+  mean(age)
+  
+  baseline_candidates = baseline_df[baseline_df$`Age_at_onset` != ".", ]
+  
+  mci_candidates = sum(baseline_df$Age_at_onset != ".")
+
+```
 
 
+First, the column names need to be adjusted since the first row is the notes of column variables. 
 
+And then we need to remove the first row. 
+
+There are `r nrow(baseline_df)` rows and `r ncol(baseline_df)` columns. 
+
+Variables are `r colnames(baseline_df)`. 
+
+And we remove patients who don't have MCI at baseline. 
+
+There are `r nrow(baseline_df)` participants but only `r mci_candidates` of them develop MCI. The average age is `r mean(age)`. The proportion of women in the study who are Apoe4 carrier is `r proportion`. 
+
+```{r amyloid}
+
+amyloid_df = 
+  read_csv("data_mci/mci_amyloid.csv") 
+
+colnames(amyloid_df) = c("Study_ID", "Baseline", "Year_2", "Year_4", "Year_6", "Year_8")
+
+amyloid_candidate = amyloid_df
+
+amyloid_df = slice(amyloid_df, 2:n()) |> 
   
+  mutate(across(c("Baseline", "Year_2", "Year_4", "Year_6", "Year_8"), ~ replace(., . == "Na", NA))) |>
   
+  filter(
+    !is.na(Baseline),
+    !is.na(`Year_2`),
+    !is.na(`Year_4`),
+    !is.na(`Year_6`),
+    !is.na(`Year_8`)
+    )
+
+```
+
+Similarly, the column names need to be changed and the first row is removed. 
+
+There are `r nrow(amyloid_candidate)` rows and `r ncol(amyloid_candidate)` columns. 
+
+Variables are `r colnames(amyloid_df)`.
+
+And we remove patients who have NA at any year. 
+
+Since the rows are not equal, there are patients who are only in one dataset. 
+
+```{r Merge them}
+
+combined_AD_df = inner_join(baseline_candidates, amyloid_df, by = "Study_ID")
+
 ```
 
