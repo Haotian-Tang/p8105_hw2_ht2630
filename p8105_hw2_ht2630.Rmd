@@ -267,7 +267,7 @@ amyloid_df = slice(amyloid_df, 2:n()) |>
     !is.na(`Year_4`),
     !is.na(`Year_6`),
     !is.na(`Year_8`)
-    )
+    ) 
 
 ```
 
@@ -279,11 +279,24 @@ Variables are `r colnames(amyloid_df)`.
 
 And we remove patients who have NA at any year. 
 
-Since the rows are not equal, there are patients who are only in one dataset. 
+Since the rows are not equal(97 in baseline dataset and 430 in amyloid dataset), there are patients who are only in one dataset. 
 
 ```{r Merge them}
 
 combined_AD_df = inner_join(baseline_candidates, amyloid_df, by = "Study_ID")
 
 ```
+There are `r nrow(combined_AD_df)` rows and `r ncol(combined_AD_df)` columns.
+
+Variables are `r colnames(combined_AD_df)`.
+
+So only `r nrow(combined_AD_df)` patients have complete data about baseline and amyloid. 
+
+The merged dataset is very easy and straightforward to perform data analysis. 
+
+```{r}
+write.csv(combined_AD_df, file = "Merged_data.csv", row.names = FALSE)
+```
+
+
 
